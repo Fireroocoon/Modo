@@ -51,6 +51,9 @@ jobs:
             # 실행 권한 부여
             chmod +x "$JAR_FILE"
 
+            # 로그 파일 초기화
+            echo "" > app.log
+
             # 애플리케이션 실행
             echo "Starting application: $JAR_FILE"
             nohup java -jar "$JAR_FILE" > app.log 2>&1 &
@@ -59,16 +62,24 @@ jobs:
             echo $! > app.pid
             echo "Application started with PID: $(cat app.pid)"
 
-            # 프로세스 시작 확인
-            sleep 10
-            if ps -p $(cat app.pid) > /dev/null; then
-              echo "Application started successfully"
-              tail -n 20 app.log
-            else
-              echo "Application failed to start. Logs:"
+            # Spring 애플리케이션 시작 로그 확인
+            echo "Waiting for Spring application to start..."
+            timeout 60 tail -f app.log | while read line; do
+              echo "$line"
+              if [[ "$line" == *"Started"* && "$line" == *"in"*"seconds"* ]]; then
+                pkill -P $$ tail
+                exit 0
+              fi
+            done
+
+            # 프로세스 실행 확인
+            if ! ps -p $(cat app.pid) > /dev/null; then
+              echo "Application failed to start. Full logs:"
               cat app.log
               exit 1
             fi
+
+            echo "Application started successfully!"
             EOL
             chmod +x ~/deploy.sh
 
