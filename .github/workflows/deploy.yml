@@ -86,15 +86,15 @@ jobs:
             echo $! > app.pid
             echo "Application started with PID: $(cat app.pid)"
 
-            # Spring 애플리케이션 시작 로그 확인
-            echo "Waiting for Spring application to start..."
-            timeout 60 tail -f app.log | while read line; do
-              echo "$line"
-              if [[ "$line" == *"Started"* && "$line" == *"in"*"seconds"* ]]; then
-                pkill -P $$ tail
-                exit 0
-              fi
-            done
+#             # Spring 애플리케이션 시작 로그 확인
+#             echo "Waiting for Spring application to start..."
+#             timeout 60 tail -f app.log | while read line; do
+#               echo "$line"
+#               if [[ "$line" == *"Started"* && "$line" == *"in"*"seconds"* ]]; then
+#                 pkill -P $$ tail
+#                 exit 0
+#               fi
+#             done
 
             # 프로세스 실행 확인
             if ! ps -p $(cat app.pid) > /dev/null; then
