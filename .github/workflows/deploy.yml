@@ -32,6 +32,7 @@ jobs:
           source: "build/libs/*.jar"
           target: "~/app"
           strip_components: 2
+          debug: true
 
       - name: Execute SSH commands
         uses: appleboy/ssh-action@master
@@ -39,6 +40,7 @@ jobs:
           host: ec2-13-124-59-140.ap-northeast-2.compute.amazonaws.com
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          debug: true
           script: |
             cd ~/app
             pkill -f '.jar' || true
