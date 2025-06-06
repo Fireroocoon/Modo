@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ "master" ]  # main 브랜치에 push가 발생하면 실행
+    branches: [ "master" ]  # master 브랜치에 push가 발생하면 실행
 
 jobs:
   deploy:
@@ -23,6 +23,16 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
+      - name: Setup Remote Directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ec2-13-124-59-140.ap-northeast-2.compute.amazonaws.com
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p ~/app
+            chmod 755 ~/app
+
       - name: Copy JAR file via SSH
         uses: appleboy/scp-action@master
         with:
@@ -34,7 +44,7 @@ jobs:
           strip_components: 2
           debug: true
 
-      - name: Execute SSH commands
+      - name: Deploy Application
         uses: appleboy/ssh-action@master
         with:
           host: ec2-13-124-59-140.ap-northeast-2.compute.amazonaws.com
@@ -42,6 +52,15 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
           script: |
-            cd ~/app
+            cd ~/app || exit 1
+            echo "Current directory: $(pwd)"
+            echo "Killing previous process if exists..."
             pkill -f '.jar' || true
-            nohup java -jar *.jar > app.log 2>&1 & 
+            echo "Starting new application..."
+            chmod +x *.jar
+            nohup java -jar *.jar > app.log 2>&1 &
+            echo "Waiting for application to start..."
+            sleep 5
+            echo "Checking if process is running..."
+            ps aux | grep java
+            echo "Deployment completed" 
