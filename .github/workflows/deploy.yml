@@ -75,9 +75,12 @@ jobs:
             # 로그 파일 초기화
             echo "" > app.log
 
-            # 애플리케이션 실행
+            # 애플리케이션 실행 (서버 주소와 포트 설정 추가)
             echo "Starting application: $JAR_FILE"
-            nohup java -jar "$JAR_FILE" > app.log 2>&1 &
+            nohup java -jar "$JAR_FILE" \
+              --server.address=0.0.0.0 \
+              --server.port=8080 \
+              > app.log 2>&1 &
 
             # PID 저장
             echo $! > app.pid
@@ -98,6 +101,15 @@ jobs:
               echo "Application failed to start. Full logs:"
               cat app.log
               exit 1
+            fi
+
+            # 포트 리스닝 확인
+            if ! netstat -tulpn 2>/dev/null | grep -q ":8080 "; then
+              echo "Warning: Application is not listening on port 8080"
+              echo "Netstat output:"
+              netstat -tulpn 2>/dev/null | grep 'java'
+            else
+              echo "Application is successfully listening on port 8080"
             fi
 
             echo "Application started successfully!"
