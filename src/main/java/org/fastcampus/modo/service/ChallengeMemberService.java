@@ -28,7 +28,7 @@ public class ChallengeMemberService {
     }
 
     public ChallengeMember joinChallenge(Integer challengeId, Integer userIdx) {
-        if (challengeMemberRepository.existsByChallengeIdAndUserIdx(challengeId, userIdx)) {
+        if (challengeMemberRepository.existsByChallenge_ChallengeIdAndUser_Idx(challengeId, userIdx)) {
             throw new IllegalStateException("이미 참여한 챌린지입니다.");
         }
 

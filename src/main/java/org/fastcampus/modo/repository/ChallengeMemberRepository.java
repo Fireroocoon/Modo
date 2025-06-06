@@ -10,9 +10,9 @@ import java.util.List;
 @Repository
 public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember, Long> {
     // Optional: 유저가 이미 참여했는지 검사
-    boolean existsByUserIdAndChallengeId(Long userId, Long challengeId);
+    boolean existsByUserIdxAndChallenge_ChallengeId(Long userIdx, Long challengeId);
 
-    boolean existsByChallengeIdAndUserIdx(Integer challengeId, Integer userIdx);
+    boolean existsByChallenge_ChallengeIdAndUser_Idx(Integer challengeId, Integer userIdx);
 
     void deleteByChallenge_ChallengeId(Integer challengeId);
 

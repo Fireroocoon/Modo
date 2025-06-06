@@ -42,7 +42,7 @@ public class ChallengeController {
         return ResponseEntity.ok("챌린지 및 관련 참가 정보가 삭제되었습니다.");
     }
 
-    @GetMapping("/{challengeId}/info")
+    @GetMapping("/{challengeId}/details")
     public ResponseEntity<ChallengeTitleDescriptionDTO> getChallengeInfo(@PathVariable Integer challengeId) {
         ChallengeTitleDescriptionDTO dto = challengeService.getChallengeInfo(challengeId);
         return ResponseEntity.ok(dto);
